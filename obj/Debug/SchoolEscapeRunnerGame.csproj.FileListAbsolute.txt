@@ -1,0 +1,10 @@
+C:\Users\USER\Desktop\VS\SchoolEscapeRunnerGame\obj\Debug\SchoolEscapeRunnerGame.csproj.AssemblyReference.cache
+C:\Users\USER\Desktop\VS\SchoolEscapeRunnerGame\obj\Debug\SchoolEscapeRunnerGame.Properties.Resources.resources
+C:\Users\USER\Desktop\VS\SchoolEscapeRunnerGame\obj\Debug\SchoolEscapeRunnerGame.csproj.GenerateResource.cache
+C:\Users\USER\Desktop\VS\SchoolEscapeRunnerGame\obj\Debug\SchoolEscapeRunnerGame.csproj.CoreCompileInputs.cache
+C:\Users\USER\Desktop\VS\SchoolEscapeRunnerGame\obj\Debug\SchoolEscapeRunnerGame.Form1.resources
+C:\Users\USER\Desktop\VS\SchoolEscapeRunnerGame\bin\Debug\SchoolEscapeRunnerGame.exe.config
+C:\Users\USER\Desktop\VS\SchoolEscapeRunnerGame\bin\Debug\SchoolEscapeRunnerGame.exe
+C:\Users\USER\Desktop\VS\SchoolEscapeRunnerGame\bin\Debug\SchoolEscapeRunnerGame.pdb
+C:\Users\USER\Desktop\VS\SchoolEscapeRunnerGame\obj\Debug\SchoolEscapeRunnerGame.exe
+C:\Users\USER\Desktop\VS\SchoolEscapeRunnerGame\obj\Debug\SchoolEscapeRunnerGame.pdb
