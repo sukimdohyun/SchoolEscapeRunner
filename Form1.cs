@@ -30,8 +30,8 @@ namespace SchoolEscapeRunnerGame
         private int landingTick = 0;
 
         // 점프 최대 높이 및 속도 설정
-        private float jumpHeight = 140f; // 최대 점프 높이
-        private float gravity = 1.5f;   // 중력가속도
+        private float jumpHeight = 300f; // 최대 점프 높이
+        private float gravity = 1.7f;   // 중력가속도
         private float jumpSpeed;        // 점프 시작 속도
 
         private int riseFrames;
@@ -185,7 +185,7 @@ namespace SchoolEscapeRunnerGame
         {
             jumpTick++;
 
-            //점프 준비 동작 (0~1번 이미지)
+            //점프 준비 동작
             if (jumpTick <= 2)
             {
                 ShowFrame(imageListJump, jumpTick - 1);
@@ -211,7 +211,7 @@ namespace SchoolEscapeRunnerGame
                 return;
             }
 
-            //중력가속도를 이용한 점프 높이 계산
+            //점프 높이 계산
             float height =
                 jumpSpeed * t - 0.5f * gravity * t * t;
 
