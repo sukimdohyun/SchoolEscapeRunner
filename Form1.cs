@@ -39,14 +39,19 @@ namespace SchoolEscapeRunnerGame
 
         private bool shiftHeld = false;
 
+        // 장애물 이동 속도 및 회피 횟수 (점수 대신 속도 증가용)
+        private int gameSpeed = 6;
+        private int avoidCount = 0;
+        private bool isGameOver = false;
+
         public Form1()
         {
             InitializeComponent();
 
             DoubleBuffered = true; // 깜빡임 방지
+            this.KeyPreview = true;
 
-
-            ground = pictureBoxPlayer.Top; //플레이어가 점프 이후 착지할 y좌표 설정
+            ground = pictureBoxPlayer.Top; // 플레이어가 점프 이후 착지할 y좌표 설정
 
             pictureBoxPlayer.Size = new Size(96, 96); // 플레이어 사이즈 설정
             pictureBoxPlayer.SizeMode =
@@ -61,7 +66,6 @@ namespace SchoolEscapeRunnerGame
             timerGame.Start();
         }
 
-    
         private void Form1_Load(object sender, EventArgs e)
         {
         }
@@ -69,6 +73,8 @@ namespace SchoolEscapeRunnerGame
         // 키 입력
         private void Game_KeyDown(object sender, KeyEventArgs e)
         {
+            if (isGameOver) return;
+
             if (e.KeyCode == Keys.ShiftKey)
             {
                 shiftHeld = true;
@@ -104,7 +110,6 @@ namespace SchoolEscapeRunnerGame
         }
 
         // 점프 시작
-
         private void StartJump()
         {
             state = PlayerState.Jump;
@@ -115,13 +120,14 @@ namespace SchoolEscapeRunnerGame
                 2f * gravity * jumpHeight
             );
         }
+
         // 이미지 리스트의 프레임 출력
         private void ShowFrame(ImageList list, int index)
         {
             index = Math.Max(
                 0,
                 Math.Min(index, list.Images.Count - 1)
-            ); 
+            );
 
             pictureBoxPlayer.Image = list.Images[index];
         }
@@ -129,6 +135,8 @@ namespace SchoolEscapeRunnerGame
         // 게임 타이머
         private void TimerGame_Tick(object sender, EventArgs e)
         {
+            if (isGameOver) return;
+
             switch (state)
             {
                 case PlayerState.Run:
@@ -146,6 +154,72 @@ namespace SchoolEscapeRunnerGame
                 case PlayerState.Landing:
                     LandingAnimation();
                     break;
+            }
+
+            // 장애물 이동, 속도 증가, 충돌 판정
+            UpdateObstacleAndSpeed();
+            CheckCollision();
+        }
+
+        // 장애물 이동 및 속도 증가 (점수 출력 없이 회피할수록 점점 빨라짐)
+        private void UpdateObstacleAndSpeed()
+        {
+            Control obstacle = this.Controls.Find("pbObstacle", true).FirstOrDefault()
+                            ?? this.Controls.Find("pictureBoxObstacle", true).FirstOrDefault();
+
+            if (obstacle == null) return;
+
+            obstacle.Left -= gameSpeed;
+
+            if (obstacle.Right < 0)
+            {
+                obstacle.Left = this.ClientSize.Width + 50;
+                avoidCount++;
+
+                if (gameSpeed < 20)
+                {
+                    gameSpeed = 6 + (avoidCount / 2);
+                }
+            }
+        }
+
+        // 충돌 판정 (.IntersectsWith)
+        private void CheckCollision()
+        {
+            Control obstacle = this.Controls.Find("pbObstacle", true).FirstOrDefault()
+                            ?? this.Controls.Find("pictureBoxObstacle", true).FirstOrDefault();
+
+            if (obstacle == null || !obstacle.Visible) return;
+
+            Rectangle playerBox = new Rectangle(
+                pictureBoxPlayer.Left + 8,
+                pictureBoxPlayer.Top + 8,
+                pictureBoxPlayer.Width - 16,
+                pictureBoxPlayer.Height - 16
+            );
+
+            Rectangle obstacleBox = new Rectangle(
+                obstacle.Left + 5,
+                obstacle.Top + 5,
+                obstacle.Width - 10,
+                obstacle.Height - 10
+            );
+
+            if (playerBox.IntersectsWith(obstacleBox))
+            {
+                isGameOver = true;
+                timerGame.Stop();
+
+                try
+                {
+                    pictureBoxPlayer.Image = Properties.Resources.player_collision;
+                }
+                catch
+                {
+                    // 리소스 이름이 다를 경우 기존 이미지 유지
+                }
+
+                MessageBox.Show("장애물에 부딪혔습니다! 게임 오버", "School Escape");
             }
         }
 
@@ -179,13 +253,12 @@ namespace SchoolEscapeRunnerGame
             animationTick++;
         }
 
-        //점프 애니메이션 및 위치 이동
-
+        // 점프 애니메이션 및 위치 이동
         private void JumpAnimation()
         {
             jumpTick++;
 
-            //점프 준비 동작
+            // 점프 준비 동작
             if (jumpTick <= 2)
             {
                 ShowFrame(imageListJump, jumpTick - 1);
@@ -194,13 +267,13 @@ namespace SchoolEscapeRunnerGame
 
             float t = jumpTick - 2;
 
-            //최고점 도달 시간
+            // 최고점 도달 시간
             float riseTime = jumpSpeed / gravity;
 
-            //전체 점프 시간
+            // 전체 점프 시간
             float totalTime = riseTime * 2f;
 
-            //착지
+            // 착지
             if (t >= totalTime)
             {
                 pictureBoxPlayer.Top = ground;
@@ -211,11 +284,11 @@ namespace SchoolEscapeRunnerGame
                 return;
             }
 
-            //점프 높이 계산
+            // 점프 높이 계산
             float height =
                 jumpSpeed * t - 0.5f * gravity * t * t;
 
-            //최대 높이 제한
+            // 최대 높이 제한
             height = Math.Max(0f, Math.Min(jumpHeight, height));
 
             pictureBoxPlayer.Top =
@@ -262,16 +335,4 @@ namespace SchoolEscapeRunnerGame
             {
                 state = shiftHeld
                     ? PlayerState.Crouch
-                    : PlayerState.Run;
-
-                animationTick = 0;
-            }
-        }
-
-        private void pictureBox1_Click(object sender, EventArgs e)
-        {
-
-        }
-    }
-
-}
+                    : PlayerState.Run
